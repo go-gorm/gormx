@@ -128,7 +128,7 @@ func checkField(structField reflect.StructField, columnName, queryExprString str
 	// or
 	if queryExprString == operatorOr {
 		if !isColumnEmpty(columnName) {
-			return fmt.Errorf("struct field(%s) with query_expr(%s) cannot update column tag", structField.Name, queryExprString)
+			return fmt.Errorf("struct field(%s) with query_expr(%s) cannot set column tag", structField.Name, queryExprString)
 		}
 		if ft.Kind() == reflect.Struct {
 		} else if ft.Kind() == reflect.Slice || ft.Kind() == reflect.Array {

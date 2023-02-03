@@ -14,11 +14,11 @@ func TestBuildSQLUpdate(t *testing.T) {
 	as.Nil(db.Migrator().AutoMigrate(&User{}))
 
 	testBuildSQLUpdate := func(opt interface{}, check func(result map[string]interface{}, sql string, err error)) {
-		result, err := buildSQLSet(opt)
+		result, err := buildSQLUpdate(opt)
 		sql := db.ToSQL(func(tx *gorm.DB) *gorm.DB {
 			return tx.Table("user").Where(Query(struct {
 				ID int `gorm:"column:id"`
-			}{ID: 1})).Updates(Set(opt))
+			}{ID: 1})).Updates(Update(opt))
 		})
 		check(result, sql, err)
 	}
@@ -260,13 +260,13 @@ func Test_StructHelper(t *testing.T) {
 	{
 		_, err := mergeJSONStructToJSONMap(0)
 		as.NotNil(err)
-		as.Equal("set(JSON_MERGE_PATCH) need struct type", err.Error())
+		as.Equal("update(JSON_MERGE_PATCH) need struct type", err.Error())
 	}
 
 	{
 		_, err := mergeJSONStructToJSONMap(Ptr[int64](1))
 		as.NotNil(err)
-		as.Equal("set(JSON_MERGE_PATCH) need struct type", err.Error())
+		as.Equal("update(JSON_MERGE_PATCH) need struct type", err.Error())
 	}
 
 	{
@@ -320,7 +320,7 @@ func Test_buildSQLUpdate(t *testing.T) {
 	as := assert.New(t)
 
 	t.Run("", func(t *testing.T) {
-		_, err := buildSQLSet(nil)
+		_, err := buildSQLUpdate(nil)
 		as.NotNil(err)
 		as.Equal("querier's data is invalid", err.Error())
 	})
