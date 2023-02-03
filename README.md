@@ -3,7 +3,7 @@
 ## Overview
 
 - Query supports gorm's where method
-- Update supports gorm's set method
+- Update supports gorm's update method
 - 95% test coverage
 
 ## Getting Started
