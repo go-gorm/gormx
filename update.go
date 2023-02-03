@@ -84,6 +84,7 @@ var updaterMap = map[string]buildUpdateExpr{
 		if s == "" {
 			return clause.Expr{}
 		}
+
 		return gorm.Expr("CASE WHEN (`"+field+"` IS NULL OR `"+field+"` = '') THEN CAST(? AS JSON) ELSE JSON_MERGE_PATCH(`"+field+"`, CAST(? AS JSON)) END", s, s)
 	},
 }
