@@ -9,7 +9,7 @@ func getValueAndType(structData interface{}) (reflect.Value, reflect.Type, error
 	rv := reflect.ValueOf(structData)
 
 	if !rv.IsValid() {
-		return reflect.Value{}, nil, fmt.Errorf("querier's data is invalid")
+		return reflect.Value{}, nil, fmt.Errorf("gormx's data is invalid")
 	}
 
 	if rv.Kind() == reflect.Ptr {
@@ -29,7 +29,7 @@ func packPanicError(r interface{}) (err error) {
 	case error:
 		return je
 	default:
-		return fmt.Errorf("gorm querier panic: %s", r)
+		return fmt.Errorf("gormx panic: %s", r)
 	}
 }
 

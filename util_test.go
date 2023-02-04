@@ -15,7 +15,7 @@ func Test_packPanicError(t *testing.T) {
 		defer func() {
 			err := packPanicError(recover())
 			as.NotNil(err)
-			as.Equal("gorm querier panic: test", err.Error())
+			as.Equal("gormx panic: test", err.Error())
 		}()
 
 		panic("test")
@@ -41,7 +41,7 @@ func Test_interfaceToSlice(t *testing.T) {
 	}{
 		{"1", []int{1, 2, 3}, []any{1, 2, 3}, nil},
 		{"2", [...]int{1, 2, 3}, []any{1, 2, 3}, nil},
-		{"3", "string", nil, fmt.Errorf("gorm querier panic: interfaceToSlice: v must be slice")},
+		{"3", "string", nil, fmt.Errorf("gormx panic: interfaceToSlice: v must be slice")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -107,7 +107,7 @@ func Test_getValueAndType(t *testing.T) {
 	t.Run("invalid", func(t *testing.T) {
 		_, _, err := getValueAndType(nil)
 		as.NotNil(err)
-		as.Equal("querier's data is invalid", err.Error())
+		as.Equal("gormx's data is invalid", err.Error())
 	})
 
 	t.Run("pointer", func(t *testing.T) {

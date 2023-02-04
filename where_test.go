@@ -5,29 +5,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
-
-func newDB() *gorm.DB {
-	db, err := gorm.Open(mysql.New(mysql.Config{
-		DSN:                       "root:@tcp(127.0.0.1:3306)/test?charset=utf8&parseTime=True&loc=Local", // data source name
-		DefaultStringSize:         256,                                                                    // default size for string fields
-		DisableDatetimePrecision:  true,                                                                   // disable datetime precision, which not supported before MySQL 5.6
-		DontSupportRenameIndex:    true,                                                                   // drop & create when rename index, rename index not supported before MySQL 5.7, MariaDB
-		DontSupportRenameColumn:   true,                                                                   // `change` when rename column, rename column not supported before MySQL 8, MariaDB
-		SkipInitializeWithVersion: false,                                                                  // auto configure based on currently MySQL version
-	}), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-	return db
-}
-
-func Ptr[T any](v T) *T {
-	return &v
-}
 
 type User struct {
 	Name string `gorm:"column:name"`
@@ -78,7 +58,7 @@ func TestBuildSQLWhere(t *testing.T) {
 		t.Run("invalid data", func(t *testing.T) {
 			_, err := buildSQLWhere(nil)
 			as.NotNil(err)
-			as.Equal("querier's data is invalid", err.Error())
+			as.Equal("gormx's data is invalid", err.Error())
 		})
 
 		t.Run("in[or] with invalid datatype", func(t *testing.T) {
@@ -289,7 +269,7 @@ func TestBuildSQLWhere(t *testing.T) {
 				ID   *int  `gorm:"column:id; query_expr:>"`
 				Name *bool `gorm:"column:name; query_expr:null"`
 			}{
-				ID: Ptr[int](1),
+				ID: ptr[int](1),
 			}, func(expression clause.Expression, sql string, err error) {
 				as.Nil(err)
 				as.Equal("SELECT * FROM `user` WHERE `id` > 1", sql)
@@ -302,7 +282,7 @@ func TestBuildSQLWhere(t *testing.T) {
 				ID   *int  `gorm:"column:id; query_expr:>="`
 				Name *bool `gorm:"column:name; query_expr:null"`
 			}{
-				ID: Ptr[int](1),
+				ID: ptr[int](1),
 			}, func(expression clause.Expression, sql string, err error) {
 				as.Nil(err)
 				as.Equal("SELECT * FROM `user` WHERE `id` >= 1", sql)
@@ -315,7 +295,7 @@ func TestBuildSQLWhere(t *testing.T) {
 				ID   *int  `gorm:"column:id; query_expr:="`
 				Name *bool `gorm:"column:name; query_expr:null"`
 			}{
-				ID: Ptr[int](1),
+				ID: ptr[int](1),
 			}, func(expression clause.Expression, sql string, err error) {
 				as.Nil(err)
 				as.Equal("SELECT * FROM `user` WHERE `id` = 1", sql)
@@ -328,7 +308,7 @@ func TestBuildSQLWhere(t *testing.T) {
 				ID   *int  `gorm:"column:id; query_expr:<"`
 				Name *bool `gorm:"column:name; query_expr:null"`
 			}{
-				ID: Ptr[int](1),
+				ID: ptr[int](1),
 			}, func(expression clause.Expression, sql string, err error) {
 				as.Nil(err)
 				as.Equal("SELECT * FROM `user` WHERE `id` < 1", sql)
@@ -341,7 +321,7 @@ func TestBuildSQLWhere(t *testing.T) {
 				ID   *int  `gorm:"column:id; query_expr:<="`
 				Name *bool `gorm:"column:name; query_expr:null"`
 			}{
-				ID: Ptr[int](1),
+				ID: ptr[int](1),
 			}, func(expression clause.Expression, sql string, err error) {
 				as.Nil(err)
 				as.Equal("SELECT * FROM `user` WHERE `id` <= 1", sql)
@@ -354,7 +334,7 @@ func TestBuildSQLWhere(t *testing.T) {
 				ID   *int  `gorm:"column:id; query_expr:!="`
 				Name *bool `gorm:"column:name; query_expr:null"`
 			}{
-				ID: Ptr[int](1),
+				ID: ptr[int](1),
 			}, func(expression clause.Expression, sql string, err error) {
 				as.Nil(err)
 				as.Equal("SELECT * FROM `user` WHERE `id` <> 1", sql)
@@ -380,7 +360,7 @@ func TestBuildSQLWhere(t *testing.T) {
 			testBuildSQLWhere(struct {
 				Name *bool `gorm:"column:name; query_expr:null"`
 			}{
-				Name: Ptr(true),
+				Name: ptr(true),
 			}, func(expression clause.Expression, sql string, err error) {
 				as.Nil(err)
 				as.Equal("SELECT * FROM `user` WHERE `name` IS NULL", sql)
@@ -392,7 +372,7 @@ func TestBuildSQLWhere(t *testing.T) {
 			testBuildSQLWhere(struct {
 				Name *bool `gorm:"column:name; query_expr:null"`
 			}{
-				Name: Ptr(false),
+				Name: ptr(false),
 			}, func(expression clause.Expression, sql string, err error) {
 				as.Nil(err)
 				as.Equal("SELECT * FROM `user` WHERE `name` IS NOT NULL", sql)
@@ -421,9 +401,9 @@ func TestBuildSQLWhere(t *testing.T) {
 			WhereUser
 			ParentID *int64 `gorm:"column:parent_id"`
 		}{
-			ParentID: Ptr[int64](1),
+			ParentID: ptr[int64](1),
 			WhereUser: WhereUser{
-				UserID: Ptr[int64](2),
+				UserID: ptr[int64](2),
 			},
 		}, func(expression clause.Expression, sql string, err error) {
 			as.Nil(err)
@@ -448,10 +428,10 @@ func TestBuildSQLWhere(t *testing.T) {
 			testBuildSQLWhere(WhereUser{
 				OrClauses1: []WhereUser{
 					{
-						UserName: Ptr("dirac"),
+						UserName: ptr("dirac"),
 					},
 					{
-						UserAge: Ptr[int64](18),
+						UserAge: ptr[int64](18),
 					},
 				},
 			}, func(expression clause.Expression, sql string, err error) {
@@ -466,13 +446,13 @@ func TestBuildSQLWhere(t *testing.T) {
 
 		t.Run("and + or", func(t *testing.T) {
 			testBuildSQLWhere(WhereUser{
-				UserID: Ptr[int64](1),
+				UserID: ptr[int64](1),
 				OrClauses1: []WhereUser{
 					{
-						UserName: Ptr("dirac"),
+						UserName: ptr("dirac"),
 					},
 					{
-						UserAge: Ptr[int64](18),
+						UserAge: ptr[int64](18),
 					},
 				},
 			}, func(expression clause.Expression, sql string, err error) {
@@ -489,7 +469,7 @@ func TestBuildSQLWhere(t *testing.T) {
 
 		t.Run("empty or", func(t *testing.T) {
 			testBuildSQLWhere(WhereUser{
-				UserID: Ptr[int64](1),
+				UserID: ptr[int64](1),
 			}, func(expression clause.Expression, sql string, err error) {
 				as.Nil(err)
 				as.Equal("SELECT * FROM `user` WHERE `user_id` = 1", sql)
@@ -499,7 +479,7 @@ func TestBuildSQLWhere(t *testing.T) {
 
 		t.Run("empty or", func(t *testing.T) {
 			testBuildSQLWhere(WhereUser{
-				UserID: Ptr[int64](1),
+				UserID: ptr[int64](1),
 				OrClauses1: []WhereUser{
 					{},
 					{},
@@ -513,21 +493,21 @@ func TestBuildSQLWhere(t *testing.T) {
 
 		t.Run("or of or", func(t *testing.T) {
 			testBuildSQLWhere(WhereUser{
-				UserID: Ptr[int64](1),
+				UserID: ptr[int64](1),
 				OrClauses1: []WhereUser{
 					{
-						UserAge: Ptr[int64](18),
+						UserAge: ptr[int64](18),
 						OrClauses1: []WhereUser{
 							{
-								UserName: Ptr("bob"),
+								UserName: ptr("bob"),
 							},
 							{
-								UserName: Ptr("dirac"),
+								UserName: ptr("dirac"),
 							},
 						},
 					},
 					{
-						UserAge: Ptr[int64](19),
+						UserAge: ptr[int64](19),
 					},
 				},
 			}, func(expression clause.Expression, sql string, err error) {
@@ -551,17 +531,17 @@ func TestBuildSQLWhere(t *testing.T) {
 
 		t.Run("multi or", func(t *testing.T) {
 			testBuildSQLWhere(WhereUser{
-				UserID: Ptr[int64](1),
+				UserID: ptr[int64](1),
 				OrClauses1: []WhereUser{
 					{
-						UserAge: Ptr[int64](18),
+						UserAge: ptr[int64](18),
 					},
 					{
-						UserAge: Ptr[int64](19),
+						UserAge: ptr[int64](19),
 					},
 				},
 				OrClauses2: &WhereUser{
-					UserName: Ptr("dirac"),
+					UserName: ptr("dirac"),
 				},
 			}, func(expression clause.Expression, sql string, err error) {
 				as.Nil(err)
@@ -586,15 +566,15 @@ func TestBuildSQLWhere(t *testing.T) {
 			}
 
 			testBuildSQLWhere(WhereUser{
-				UserAge: Ptr[int64](18),
+				UserAge: ptr[int64](18),
 				OrClauses: []WhereUser{
 					{
-						UserID:   Ptr[int64](123),
-						UserName: Ptr("bob"),
+						UserID:   ptr[int64](123),
+						UserName: ptr("bob"),
 					},
 					{
-						UserID:   Ptr[int64](234),
-						UserName: Ptr("dirac"),
+						UserID:   ptr[int64](234),
+						UserName: ptr("dirac"),
 					},
 				},
 			}, func(expression clause.Expression, sql string, err error) {

@@ -27,7 +27,7 @@ func TestBuildSQLUpdate(t *testing.T) {
 		testBuildSQLUpdate(struct {
 			Age *int `gorm:"column:age; update_expr:invalid"`
 		}{
-			Age: Ptr[int](1),
+			Age: ptr[int](1),
 		}, func(m map[string]interface{}, sql string, err error) {
 			as.NotNil(err)
 			as.Equal("", sql)
@@ -89,7 +89,7 @@ func TestBuildSQLUpdate(t *testing.T) {
 		testBuildSQLUpdate(struct {
 			Age *int `gorm:"column:age; update_expr:+"`
 		}{
-			Age: Ptr[int](1),
+			Age: ptr[int](1),
 		}, func(m map[string]interface{}, sql string, err error) {
 			as.Nil(err)
 			as.Equal("UPDATE `user` SET `age`=age + 1 WHERE `id` = 1", sql)
@@ -103,7 +103,7 @@ func TestBuildSQLUpdate(t *testing.T) {
 		testBuildSQLUpdate(struct {
 			Age *int `gorm:"column:age; update_expr:-"`
 		}{
-			Age: Ptr[int](1),
+			Age: ptr[int](1),
 		}, func(m map[string]interface{}, sql string, err error) {
 			as.Nil(err)
 			as.Equal("UPDATE `user` SET `age`=age - 1 WHERE `id` = 1", sql)
@@ -264,7 +264,7 @@ func Test_StructHelper(t *testing.T) {
 	}
 
 	{
-		_, err := mergeJSONStructToJSONMap(Ptr[int64](1))
+		_, err := mergeJSONStructToJSONMap(ptr[int64](1))
 		as.NotNil(err)
 		as.Equal("update(JSON_MERGE_PATCH) need struct type", err.Error())
 	}
@@ -283,7 +283,7 @@ func Test_StructHelper(t *testing.T) {
 		m, err := mergeJSONStructToJSONMap(struct {
 			Name *string `json:"name"`
 		}{
-			Name: Ptr("name1"),
+			Name: ptr("name1"),
 		})
 		as.Nil(err)
 		as.Equal(map[string]interface{}(map[string]interface{}{"name": "name1"}), m)
@@ -295,7 +295,7 @@ func Test_StructHelper(t *testing.T) {
 			Name *string `json:"name"`
 			Age  *int    `json:"age"`
 		}{
-			Name: Ptr("name1"),
+			Name: ptr("name1"),
 			Age:  nil,
 		})
 		as.Nil(err)
@@ -308,7 +308,7 @@ func Test_StructHelper(t *testing.T) {
 			Name *string `json:"name"`
 			Age  int32   `json:"age"`
 		}{
-			Name: Ptr("name1"),
+			Name: ptr("name1"),
 			Age:  0,
 		})
 		as.Nil(err)
@@ -322,6 +322,6 @@ func Test_buildSQLUpdate(t *testing.T) {
 	t.Run("", func(t *testing.T) {
 		_, err := buildSQLUpdate(nil)
 		as.NotNil(err)
-		as.Equal("querier's data is invalid", err.Error())
+		as.Equal("gormx's data is invalid", err.Error())
 	})
 }

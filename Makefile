@@ -9,7 +9,6 @@ check:
 lint:
 	@$(set_env) ./.github/pre_install.sh
 	@$(set_env) go fmt ./...
-	@$(set_env) remove_import_blanklines
 	@$(set_env) goimports -local $(local_package) -w .
 	@$(set_env) gofumpt -l -w .
 
