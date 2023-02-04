@@ -50,8 +50,4 @@ func testDB(db *gorm.DB) {
 		log.Printf("failed to ping sqlDB, got error %v", err)
 		os.Exit(1)
 	}
-
-	if db.Dialector.Name() == "sqlite" {
-		db.Exec("PRAGMA foreign_keys = ON")
-	}
 }

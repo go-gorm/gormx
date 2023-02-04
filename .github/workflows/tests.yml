@@ -1,7 +1,10 @@
 name: tests
 
 on:
+  push:
+    branches: [ master ]
   pull_request:
+    branches: [ master ]
 
 permissions:
   contents: read
@@ -11,7 +14,7 @@ jobs:
   mysql:
     strategy:
       matrix:
-        go: ['1.19', '1.18']
+        go: ['1.20', '1.19', '1.18']
         platform: [ubuntu-latest]
     runs-on: ${{ matrix.platform }}
 
@@ -52,3 +55,9 @@ jobs:
 
     - name: Tests
       run: GITHUB_ACTION=true GORM_DIALECT=mysql GORM_DSN="gorm:gorm@tcp(localhost:9910)/gorm?charset=utf8&parseTime=True" make test
+
+    - name: Upload Cov
+      run: |
+        curl -Os https://uploader.codecov.io/latest/linux/codecov
+        chmod +x codecov
+        ./codecov -f c.out
